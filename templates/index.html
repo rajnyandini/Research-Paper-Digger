@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Research Paper Chatbot – Professional</title>
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: #eff2f7;
+            color: #222;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: #002b5b;
+            color: #fff;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgb(0 0 0 / 0.2);
+        }
+        header h1 {
+            font-size: 1.9rem;
+            letter-spacing: 2px;
+            user-select: none;
+        }
+        .toggle-theme {
+            background: #0051ba;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 7px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            user-select: none;
+        }
+        .toggle-theme:hover {
+            background: #003974;
+        }
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 35px;
+            padding: 30px;
+            max-width: 1300px;
+            margin: 0 auto 50px;
+        }
+        section {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 8px 16px rgb(0 0 0 / 0.1);
+            padding: 25px 28px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            margin-bottom: 12px;
+            color: #002b5b;
+            font-weight: 700;
+            letter-spacing: 0.7px;
+            user-select: none;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #111;
+            font-size: 1.05rem;
+            user-select: none;
+        }
+        textarea {
+            width: 100%;
+            resize: vertical;
+            min-height: 90px;
+            border-radius: 10px;
+            border: 1.8px solid #cfd8e3;
+            font-size: 1rem;
+            padding: 14px 16px;
+            transition: 0.3s border-color;
+            font-family: inherit;
+            background: #f5f9fc;
+            box-shadow: inset 1px 1px 3px rgb(0 0 0 / 0.05);
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #0051ba;
+            box-shadow: 0 0 8px #007bff80;
+            background: white;
+        }
+        button {
+            border: none;
+            background-color: #0051ba;
+            padding: 14px 22px;
+            margin-top: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: background-color 0.3s;
+            align-self: flex-start;
+            box-shadow: 0 3px 7px rgb(0 81 186 / 0.45);
+        }
+        button:hover {
+            background-color: #003974;
+        }
+        #search-output, #chat-output {
+            flex: 1;
+            margin-top: 18px;
+            background-color: #e9eef9;
+            border-radius: 12px;
+            padding: 16px 22px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            box-shadow: inset 0 4px 10px rgb(0 0 0 / 0.05);
+            border: 1.5px solid #cbd6e9;
+            line-height: 1.45;
+            font-weight: 400;
+        }
+        .paper-card {
+            background: white;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgb(0 0 0 / 0.08);
+            border-left: 5px solid #0051ba;
+            cursor: default;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s;
+        }
+        .paper-card:hover {
+            box-shadow: 0 8px 20px rgb(0 0 0 / 0.15);
+        }
+        .paper-title {
+            color: #0051ba;
+            font-weight: 700;
+            font-size: 1.15rem;
+            text-decoration: none;
+            user-select: text;
+        }
+        .paper-meta {
+            margin: 6px 0 10px 0;
+            font-style: italic;
+            color: #555;
+            font-size: 0.9rem;
+            user-select: text;
+        }
+        .paper-summary {
+            color: #333;
+            font-weight: 400;
+            user-select: text;
+            white-space: pre-line;
+        }
+        /* Chat styles */
+        #chat-output {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.95rem;
+            letter-spacing: 0.2px;
+            color: #222;
+        }
+        .chat-message {
+            margin-bottom: 14px;
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 90%;
+            line-height: 1.45;
+            font-weight: 500;
+            word-wrap: break-word;
+            user-select: text;
+            box-shadow: 0 2px 7px rgb(0 0 0 / 0.06);
+            transition: background-color 0.3s;
+        }
+        .chat-message.user {
+            background: #0051ba;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 3px 8px rgb(0 81 186 / 0.6);
+        }
+        .chat-message.bot {
+            background: #dddff3;
+            color: #111;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        .chat-scroll {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #a3c0ff #dee5f7;
+        }
+        /* Scrollbar for Webkit */
+        #search-output::-webkit-scrollbar, #chat-output::-webkit-scrollbar {
+            width: 9px;
+        }
+        #search-output::-webkit-scrollbar-thumb, #chat-output::-webkit-scrollbar-thumb {
+            background-color: #a3c0ff;
+            border-radius: 8px;
+        }
+        #search-output::-webkit-scrollbar-track, #chat-output::-webkit-scrollbar-track {
+            background-color: #dee5f7;
+            border-radius: 8px;
+        }
+        /* Loading Spinner */
+        .spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0051ba;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 40px auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+        /* Responsive */
+        @media (max-width: 1100px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+            section {
+                max-width: 700px;
+                margin: 20px auto;
+            }
+        }
+        /* Dark mode */
+        body.dark {
+            background: #121519;
+            color: #eee;
+        }
+        body.dark header {
+            background: #19232d;
+            box-shadow: 0 2px 10px rgb(255 255 255 / 0.1);
+        }
+        body.dark .toggle-theme {
+            background: #3161a6;
+            color: #e0e8ff;
+        }
+        body.dark .toggle-theme:hover {
+            background: #13418a;
+        }
+        body.dark main {
+            background: transparent;
+        }
+        body.dark section {
+            background: #1e2939;
+            box-shadow: 0 8px 16px rgb(255 255 255 / 0.07);
+        }
+        body.dark textarea {
+            background: #2a384f;
+            border-color: #394b6f;
+            color: #e2e8f0;
+        }
+        body.dark textarea:focus {
+            background: #1e2939;
+            box-shadow: 0 0 8px #3161a6aa;
+            border-color: #3161a6;
+            outline: none;
+        }
+        body.dark button {
+            background-color: #3161a6;
+            box-shadow: 0 3px 7px rgb(49 97 166 / 0.75);
+            color: #ddeeff;
+        }
+        body.dark button:hover {
+            background-color: #13418a;
+        }
+        body.dark #search-output, body.dark #chat-output {
+            background-color: #2a384f;
+            border-color: #394b6f;
+            color: #dbe9ff;
+            box-shadow: inset 0 4px 10px rgb(49 97 166 / 0.13);
+        }
+        body.dark .paper-card {
+            background: #163061;
+            border-left-color: #2a8af7;
+            box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
+        }
+        body.dark .paper-title {
+            color: #2a8af7;
+        }
+        body.dark .paper-meta {
+            color: #a4bbff;
+        }
+        body.dark .paper-summary {
+            color: #d5e4ff;
+        }
+        body.dark .chat-message.user {
+            background: #2a6beb;
+            box-shadow: 0 3px 8px rgb(42 107 235 / 0.9);
+            color: #e5eaff;
+        }
+        body.dark .chat-message.bot {
+            background: #395090;
+            color: #cee2ff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research Paper Chatbot</h1>
+        <button class="toggle-theme" aria-label="Toggle Dark/Light Mode" onclick="toggleTheme()">Dark Mode</button>
+    </header>
+    <main>
+        <section id="search-section" aria-label="Search Research Papers">
+            <h2>Research Paper Search</h2>
+            <label for="topic-input">Enter research topic</label>
+            <textarea id="topic-input" placeholder="Type a research topic, e.g. ‘neural networks’"></textarea>
+            <button id="search-btn">Search Papers</button>
+            <div id="search-output" aria-live="polite" tabindex="0">Results will appear here.</div>
+        </section>
+
+        <section id="chat-section" aria-label="Chat with Research Bot">
+            <h2>Research Chat</h2>
+            <label for="chat-input">Chat about research papers</label>
+            <textarea id="chat-input" placeholder="Ask questions or have a conversation..."></textarea>
+            <button id="chat-send-btn">Send</button>
+            <div id="chat-output" class="chat-scroll" aria-live="polite" tabindex="0"><em>Chat messages will appear here...</em></div>
+        </section>
+    </main>
+
+    <script>
+        // Dark mode toggle - remember preference
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const btn = document.querySelector('.toggle-theme');
+            if(document.body.classList.contains('dark')) {
+                btn.textContent = 'Light Mode';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                btn.textContent = 'Dark Mode';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        // Load saved theme on page load
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            document.querySelector('.toggle-theme').textContent = 'Light Mode';
+        }
+
+        const searchBtn = document.getElementById('search-btn');
+        const topicInput = document.getElementById('topic-input');
+        const searchOutput = document.getElementById('search-output');
+
+        const chatSendBtn = document.getElementById('chat-send-btn');
+        const chatInput = document.getElementById('chat-input');
+        const chatOutput = document.getElementById('chat-output');
+
+        // Utility to create a loading spinner markup
+        function spinnerHTML() {
+            return '<div class="spinner" role="status" aria-live="assertive" aria-label="Loading"></div>';
+        }
+
+        // Scroll chat to bottom
+        function scrollChatToBottom() {
+            chatOutput.scrollTop = chatOutput.scrollHeight;
+        }
+
+        // Append message to chat window
+        function appendChatMessage(who, text, isError = false) {
+            if (chatOutput.textContent === 'Chat messages will appear here...') {
+                chatOutput.innerHTML = '';
+            }
+            const div = document.createElement('div');
+            div.classList.add('chat-message');
+            div.classList.add(who === 'You' ? 'user' : 'bot');
+            if (isError) div.style.color = 'red';
+            div.setAttribute('role', 'article');
+            div.setAttribute('aria-label', who + ' message');
+            div.textContent = `${who}: ${text}`;
+            chatOutput.appendChild(div);
+            scrollChatToBottom();
+        }
+
+        // Search papers functionality
+        searchBtn.addEventListener('click', async () => {
+            let topic = topicInput.value.trim();
+            if(!topic) {
+                searchOutput.innerHTML = '<p style="color:red;">Please enter a topic to search.</p>';
+                topicInput.focus();
+                return;
+            }
+            searchOutput.innerHTML = spinnerHTML();
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({topic})
+                });
+                const data = await response.json();
+
+                if(data.error) {
+                    searchOutput.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+                    return;
+                }
+                if(data.suggestions) {
+                    // This block will execute if the backend sends a suggestions message
+                    searchOutput.innerHTML = `<h3>No papers found.</h3><p>${data.suggestions}</p>`;
+                    return;
+                }
+                if(data.papers.length === 0) {
+                    searchOutput.innerHTML = '<p>No papers found.</p>';
+                    return;
+                }
+
+                let html = '';
+                data.papers.forEach(paper => {
+                    // Note: paper.summary will contain the abstract itself if the API key is missing.
+                    html += `
+                        <article class="paper-card" tabindex="0">
+                            <a href="${paper.url}" target="_blank" rel="noopener" class="paper-title" aria-label="Open paper titled: ${paper.title}">${paper.title}</a>
+                            <div class="paper-meta"><span>Authors:</span> ${paper.authors} | <span>Year:</span> ${paper.year} | <span>Venue:</span> ${paper.venue}</div>
+                            <div class="paper-summary">${paper.summary}</div>
+                        </article>
+                    `;
+                });
+                searchOutput.innerHTML = html;
+                searchOutput.focus();
+
+            } catch (err) {
+                searchOutput.innerHTML = `<p style="color:red;">Request failed: ${err.message}</p>`;
+            }
+        });
+
+        // Chat send button click or Enter key
+        chatSendBtn.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keydown', e => {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Chat message sender
+        async function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if(!message) return;
+
+            appendChatMessage('You', message);
+            chatInput.value = '';
+            chatInput.focus();
+
+            let loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chat-message bot';
+            loadingDiv.innerHTML = spinnerHTML();
+            loadingDiv.setAttribute('role','status');
+            loadingDiv.setAttribute('aria-live','polite');
+            chatOutput.appendChild(loadingDiv);
+            scrollChatToBottom();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message})
+                });
+                const data = await response.json();
+                loadingDiv.remove();
+
+                if(data.error) {
+                    appendChatMessage('Bot', data.error, true);
+                } else {
+                    appendChatMessage('Bot', data.response);
+                }
+            } catch (err) {
+                loadingDiv.remove();
+                appendChatMessage('Bot', `Request failed: ${err.message}`, true);
+            }
+        }
+    </script>
+</body>
+</html>
